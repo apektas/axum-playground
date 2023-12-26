@@ -3,7 +3,7 @@ use self::error::{Error, Result};
 
 use axum::extract::{Path, Query};
 use axum::response::{Html, IntoResponse, Response};
-use axum::Router;
+use axum::{middleware, Router};
 use axum::routing::{get, get_service};
 use serde::Deserialize;
 use tokio::net::TcpListener;
@@ -21,6 +21,7 @@ async fn main() {
     let routes_all = Router::new()
         .merge(routes_hello())
         .merge(web::routes_login::routes())
+        .layer(middleware::map_response(main_response_mapper))
         .fallback_service(routes_static());
 
     //endregion: Server
@@ -74,4 +75,10 @@ async fn handler_hello_path_variable(Path(name): Path<String>) -> impl IntoRespo
     println!("->> {:<12} - handler hello - {name:?}", "HANDLER");
 
     Html(format!("Hello {name}!!!"))
+}
+
+async fn main_response_mapper(res: Response) -> Response {
+    println!("->> {:<12} - main_response_mapper", "RES_MAPPER");
+    println!();
+    res
 }
