@@ -4,9 +4,11 @@ use self::error::{Error, Result};
 use axum::extract::{Path, Query};
 use axum::response::{Html, IntoResponse, Response};
 use axum::Router;
-use axum::routing::get;
+use axum::routing::{get, get_service};
 use serde::Deserialize;
 use tokio::net::TcpListener;
+use tower_http::services::ServeDir;
+
 mod error;
 
 
@@ -16,7 +18,8 @@ async fn main() {
 
     //region: Server
     let routes_all = Router::new()
-        .merge(routes_hello());
+        .merge(routes_hello())
+        .fallback_service(routes_static());
 
     //endregion: Server
 
@@ -42,11 +45,17 @@ fn routes_hello() -> Router {
 // endregion
 
 
+// region - Static File Serve via tower-http service
+fn routes_static() -> Router {
+    Router::new().nest_service("/", get_service(ServeDir::new("./")))
+}
+
+// endregion
+
 #[derive(Debug, Deserialize)]
 struct  HelloParams {
     name: Option<String>,
 }
-
 
 // region - handler Hello
 async fn handler_hello(Query(params): Query<HelloParams>) -> impl IntoResponse {

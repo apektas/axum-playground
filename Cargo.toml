@@ -10,6 +10,9 @@ tokio = {version = "1", features = ["full"]}
 # axum webframework
 axum = "0.7.2"
 
+# file serve
+tower-http = { version = "0.5.0", features = ["fs"]}
+
 # serde / json
 serde = {version = "1", features = ["derive"]}
 serde_json = "1"

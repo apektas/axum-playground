@@ -7,6 +7,8 @@ async fn main_page_test() -> Result<()> {
 
     //client.do_get("/hello?name=apektas").await?.print().await?;
     client.do_get("/hello2/apektas_var").await?.print().await?;
+    client.do_get("/src/main.rs").await?.print().await?;
+
     Ok(())
 
 }
