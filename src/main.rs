@@ -10,6 +10,7 @@ use tokio::net::TcpListener;
 use tower_http::services::ServeDir;
 
 mod error;
+mod web;
 
 
 
@@ -19,6 +20,7 @@ async fn main() {
     //region: Server
     let routes_all = Router::new()
         .merge(routes_hello())
+        .merge(web::routes_login::routes())
         .fallback_service(routes_static());
 
     //endregion: Server
