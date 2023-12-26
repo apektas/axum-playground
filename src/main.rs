@@ -15,17 +15,15 @@ mod error;
 async fn main() {
 
     //region: Server
-    let routes_hello = Router::new().route(
-        "/hello",
-        get(handler_hello))
-        .route("/hello2/:name", get(handler_hello_path_variable));
+    let routes_all = Router::new()
+        .merge(routes_hello());
 
     //endregion: Server
 
 
     let listener = TcpListener::bind("127.0.0.1:8080").await.unwrap();
     println!("->> LISTENING on {:?}\n", listener.local_addr());
-    axum::serve(listener, routes_hello.into_make_service())
+    axum::serve(listener, routes_all.into_make_service())
         .await
         .unwrap();
 
@@ -33,6 +31,16 @@ async fn main() {
 
     // endregion: Model
 }
+
+// region - Routes Hello
+fn routes_hello() -> Router {
+    Router::new()
+        .route("/hello", get(handler_hello))
+        .route("/hello2/:name", get(handler_hello_path_variable))
+}
+
+// endregion
+
 
 #[derive(Debug, Deserialize)]
 struct  HelloParams {
@@ -49,6 +57,7 @@ async fn handler_hello(Query(params): Query<HelloParams>) -> impl IntoResponse {
     Html(format!("Hello {name}!!!"))
 }
 
+// endregion
 
 async fn handler_hello_path_variable(Path(name): Path<String>) -> impl IntoResponse {
     println!("->> {:<12} - handler hello - {name:?}", "HANDLER");
