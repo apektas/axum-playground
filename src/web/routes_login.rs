@@ -2,7 +2,8 @@ use axum::{Json, Router};
 use axum::routing::post;
 use serde::Deserialize;
 use serde_json::{json, Value};
-use crate::{Error, Result};
+use tower_cookies::{Cookie, Cookies};
+use crate::{Error, Result, web};
 
 
 pub fn routes() -> Router {
@@ -10,7 +11,7 @@ pub fn routes() -> Router {
 }
 
 
-async fn api_login(payload: Json<LoginPayload>) -> Result<Json<Value>> {
+async fn api_login(cookies:Cookies, payload: Json<LoginPayload>) -> Result<Json<Value>> {
     println!("->> {:<12} - api_login", "HANDLER");
 
     // TODO: implement real db/auth login
@@ -19,6 +20,8 @@ async fn api_login(payload: Json<LoginPayload>) -> Result<Json<Value>> {
         return Err(Error::LoginFail);
     }
 
+    // FIXME: Implement real auth-token generation/signature.
+    cookies.add(Cookie::new(web::AUTH_TOKEN, "user-1.exp.sign"));
     // TODO: Set cookies
 
     // Create success body
