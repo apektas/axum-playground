@@ -9,19 +9,24 @@ use serde::Deserialize;
 use tokio::net::TcpListener;
 use tower_cookies::{CookieManager, CookieManagerLayer, Cookies};
 use tower_http::services::ServeDir;
+use crate::model::ModelController;
 
 mod error;
 mod web;
-
+mod model;
 
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()>{
+
+    // Initialize the ModelController
+    let mc = ModelController::new().await?;
 
     //region: Server
     let routes_all = Router::new()
         .merge(routes_hello())
         .merge(web::routes_login::routes())
+        .nest("/api", web::routes_tickets::routes(mc.clone()))
         .layer(middleware::map_response(main_response_mapper))
         .layer(CookieManagerLayer::new())
         .fallback_service(routes_static());
@@ -38,6 +43,8 @@ async fn main() {
     // region: Model
 
     // endregion: Model
+
+    Ok(())
 }
 
 // region - Routes Hello
