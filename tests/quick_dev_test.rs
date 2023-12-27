@@ -19,7 +19,7 @@ async fn main_page_test() -> Result<()> {
     );
 
     // Disable to see auth exception.
-    // req_login.await?.print().await?;
+    req_login.await?.print().await?;
 
 
     let req_create_ticket = client.do_post(
