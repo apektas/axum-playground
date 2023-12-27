@@ -11,6 +11,9 @@ use tower_cookies::{CookieManager, CookieManagerLayer, Cookies};
 use tower_http::services::ServeDir;
 use crate::model::ModelController;
 
+
+mod ctx;
+
 mod error;
 mod web;
 mod model;
