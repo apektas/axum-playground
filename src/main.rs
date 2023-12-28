@@ -35,6 +35,11 @@ async fn main() -> Result<()>{
         .merge(web::routes_login::routes())
         .nest("/api", routes_apis)
         .layer(middleware::map_response(main_response_mapper))
+        .layer(middleware::from_fn_with_state(
+            mc.clone(),
+            web::mw_auth::mw_ctx_resolver
+        ))
+        // Cookie manager should first executed - ordering is matter here
         .layer(CookieManagerLayer::new())
         .fallback_service(routes_static());
 
