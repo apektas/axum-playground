@@ -4,6 +4,7 @@ use self::error::{Error, Result};
 use axum::extract::{Path, Query};
 use axum::response::{Html, IntoResponse, Response};
 use axum::{middleware, Router};
+use axum::http::StatusCode;
 use axum::routing::{get, get_service};
 use serde::Deserialize;
 use tokio::net::TcpListener;
@@ -95,7 +96,7 @@ async fn handler_hello(Query(params): Query<HelloParams>) -> impl IntoResponse {
 async fn handler_hello_path_variable(Path(name): Path<String>) -> impl IntoResponse {
     println!("->> {:<12} - handler hello - {name:?}", "HANDLER");
 
-    Html(format!("Hello {name}!!!"))
+    (StatusCode::OK, Html(format!("Hello {name}!!!")))
 }
 
 async fn main_response_mapper(res: Response) -> Response {
