@@ -26,6 +26,11 @@ lazy-regex = { version = "3.1.0"}
 # adding async  - implement trait which has async function
 async-trait = "0.1.75"
 
+# serialize the enum
+strum_macros = "0.25.3"
+
+uuid = { version = "1.6.1" , features = ["v4", "fast-rng"]}
+
 [dev-dependencies]
 anyhow = "1"
 httpc-test = "0.1.8"
