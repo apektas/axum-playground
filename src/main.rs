@@ -4,7 +4,7 @@ use self::error::{Error, Result};
 use axum::extract::{Path, Query};
 use axum::response::{Html, IntoResponse, Response};
 use axum::{Json, middleware, Router};
-use axum::http::StatusCode;
+use axum::http::{Method, StatusCode, Uri};
 use axum::routing::{get, get_service};
 use serde::Deserialize;
 use serde_json::json;
@@ -12,6 +12,8 @@ use tokio::net::TcpListener;
 use tower_cookies::{CookieManager, CookieManagerLayer, Cookies};
 use tower_http::services::ServeDir;
 use uuid::Uuid;
+use crate::ctx::Ctx;
+use crate::log::log_request;
 use crate::model::ModelController;
 
 
@@ -21,6 +23,7 @@ mod error;
 mod web;
 mod model;
 
+mod log;
 
 #[tokio::main]
 async fn main() -> Result<()>{
@@ -101,7 +104,12 @@ async fn handler_hello_path_variable(Path(name): Path<String>) -> impl IntoRespo
     (StatusCode::OK, Html(format!("Hello {name}!!!")))
 }
 
-async fn main_response_mapper(res: Response) -> Response {
+async fn main_response_mapper(
+    ctx: Option<Ctx>,
+    uri: Uri,
+    req_method: Method,
+    res: Response,
+) -> Response {
     println!("->> {:<12} - main_response_mapper", "RES_MAPPER");
 
 
@@ -128,6 +136,10 @@ async fn main_response_mapper(res: Response) -> Response {
         });
 
     //
+    // --> Same as this in scala:
+    // foo: Option[(String, Int)]; foo.map(_._2)
+    let client_error = client_status_error.unzip().1;
+    log_request(uuid, req_method, uri, ctx, service_error, client_error).await;
 
     println!("->> server log line {:<12} Error: {service_error:?}", uuid);
 
